@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Social Security carries a substantial tax disadvantage when choosing to go back to work.
+     People can simply enter the benefit amount and taxable income into the Senior Tax calculator,
+     and the calculator computes the amount of Social Security benefits subject to income tax.">
+    <meta name="keywords" content="Social Security, taxable income, calculator, benefit amount, income tax, benefits">
+
+    <title>Senior Tax</title>
+    <!--<link rel="stylesheet" type="text/css" href="cssSlider.css">-->
+    <!--<link rel="stylesheet" type="text/css" href="./dest/tooltip.css">-->
+    <style>
+        .wrapper {
+            /*text-transform: uppercase;*/
+            /*background: #ececec;*/
+            /*color: #555;*/
+            cursor: help;
+            /*font-family: "Gill Sans", Impact, sans-serif;*/
+            /*font-size: 20px;*/
+            /*margin: 100px 75px 10px 75px;*/
+            /*padding: 15px 20px;*/
+            /*position: relative;*/
+            /*text-align: center;*/
+            /*width: 200px;*/
+            -webkit-transform: translateZ(0); /* webkit flicker fix */
+            -webkit-font-smoothing: antialiased; /* webkit text rendering fix */
+        }
+
+        .wrapper .tooltip {
+            background: #1496bb;
+            bottom: 100%;
+            color: #fff;
+            display: block;
+            left: -25px;
+            margin-bottom: 15px;
+            opacity: 0;
+            padding: 10px;
+            pointer-events: none;
+            position: absolute;
+            width: 100%;
+            -webkit-transform: translateY(10px);
+            transform: translateY(10px);
+            transition: all .25s ease-out;
+            box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.28);
+        }
+
+        /* This bridges the gap so you can mouse into the tooltip without it disappearing */
+        .wrapper .tooltip:before {
+            bottom: -20px;
+            content: " ";
+            display: block;
+            height: 20px;
+            left: 0;
+            position: absolute;
+            width: 100%;
+        }
+        /* CSS Triangles - see Trevor's post */
+        .wrapper .tooltip:after {
+            border-left: solid transparent 10px;
+            border-right: solid transparent 10px;
+            border-top: solid #1496bb 10px;
+            bottom: -10px;
+            content: " ";
+            height: 0;
+            left: 50%;
+            margin-left: -13px;
+            position: absolute;
+            width: 0;
+        }
+
+        .wrapper:hover .tooltip {
+            opacity: 1;
+            pointer-events: auto;
+            -webkit-transform: translateY(0px);
+            transform: translateY(0px);
+        }
+
+        /* IE can just show/hide with no transition */
+        .lte8 .wrapper .tooltip {
+            display: none;
+        }
+
+        .lte8 .wrapper:hover .tooltip {
+            display: block;
+        }
+    </style>
+    <style>
+        input[type=range] {
+            -webkit-appearance: none;
+            margin: 10px 0;
+            width: 100%;
+        }
+        input[type=range]:focus {
+            outline: none;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 10px;
+            cursor: pointer;
+            animate: 0.2s;
+            box-shadow: 1px 1px 1px #000000;
+            background: #A2A3A9;
+            border-radius: 5px;
+            border: 1px solid #000000;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            box-shadow: 1px 1px 1px #000000;
+            border: 1px solid #000000;
+            height: 35px;
+            width: 43px;
+            border-radius: 5px;
+            background: #FFFFFF;
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: -13.5px;
+        }
+        input[type=range]:focus::-webkit-slider-runnable-track {
+            background: #A2A3A9;
+        }
+        input[type=range]::-moz-range-track {
+            width: 100%;
+            height: 10px;
+            cursor: pointer;
+            animate: 0.2s;
+            box-shadow: 1px 1px 1px #000000;
+            background: #A2A3A9;
+            border-radius: 5px;
+            border: 1px solid #000000;
+        }
+        input[type=range]::-moz-range-thumb {
+            box-shadow: 1px 1px 1px #000000;
+            border: 1px solid #000000;
+            height: 35px;
+            width: 43px;
+            border-radius: 5px;
+            background: #FFFFFF;
+            cursor: pointer;
+        }
+        input[type=range]::-ms-track {
+            width: 100%;
+            height: 10px;
+            cursor: pointer;
+            animate: 0.2s;
+            background: transparent;
+            border-color: transparent;
+            color: transparent;
+        }
+        input[type=range]::-ms-fill-lower {
+            background: #A2A3A9;
+            border: 1px solid #000000;
+            border-radius: 10px;
+            box-shadow: 1px 1px 1px #000000;
+        }
+        input[type=range]::-ms-fill-upper {
+            background: #A2A3A9;
+            border: 1px solid #000000;
+            border-radius: 10px;
+            box-shadow: 1px 1px 1px #000000;
+        }
+        input[type=range]::-ms-thumb {
+            box-shadow: 1px 1px 1px #000000;
+            border: 1px solid #000000;
+            height: 35px;
+            width: 43px;
+            border-radius: 5px;
+            background: #FFFFFF;
+            cursor: pointer;
+        }
+        input[type=range]:focus::-ms-fill-lower {
+            background: #A2A3A9;
+        }
+        input[type=range]:focus::-ms-fill-upper {
+            background: #A2A3A9;
+        }
+    </style>
+    <style>
+        .data-container {
+            display: flex;
+            justify-content: space-around;
+            max-width: 1000px;
+           margin: 0 auto;
+        }
+        table .table-calc {
+            border-collapse: collapse;
+            width: 50%;
+            font-size: 10px;;
+        }
+        table, td, th {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+        th, td {
+            text-align: left;
+            padding: 8px;
+            /*font-size: 1.9vh;*/
+        }
+        table .header {
+            border: 0;
+        }
+        tr:nth-child(even){background-color: #f2f2f2}
+        #line1 br{
+            display: none
+        }
+        #line3 br{
+             display: none
+         }
+        #maxxed {
+            color: red;
+            font-size: 10px;
+        }
+        .run-in { display:inline;
+            font-size: 12px;
+        font-style: italic;
+        }
+        .center {
+            text-align: center;
+        }
+        .nicecolor:hover {
+            background: greenyellow;
+        }
+
+        #fader {
+            width: 100%;
+            /*height: 40px;*/
+        }
+
+        #selected-input {
+
+        }
+        #quick-tax > table {
+            table-layout: fixed;
+            width: 450px;
+        }
+        .yellow-back {
+            background: yellow;
+        }
+        .red-rate {
+            background: #e77;
+        }
+        .hide {
+            display: none;
+        }
+        #senior-reveal {
+            font-size: 30px;
+            padding: 15px;
+            background: #e77;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div id="top"></div>
+<h1  class="center"  style="margin: 0;" onclick="top.location.href = '#calc';">Senior Tax</h1>
+<p class="center" style="margin: 0;">Senior Tax is a two part tax:</p>
+<ul>
+    <li><p> <larger  style="font-size:18px"> Part One:</larger> FICA deductions on older folks who are already recieving benefis receive NO extra benefits.
+        In effect, a tax only for seniors.</p></li>
+    <li><p><larger  style="font-size:18px">Part Two:</larger> Wages earned while receiving social security benefits may have up to 85% of their benefits
+        taxed as ordinary income. Even though contributions into the social security system all already taxed. This is in
+        effect DOUBLE taxation. <a href="SocialSecurityBenefitsWorksheet.jpg">(see this worksheet)</a> </p></li>
+</ul>
+
+
+
+<hr>
+<div id="calc-intro">
+<h3 class="center">Calculate tax from earned income while you are getting Social Security benefits</h3>
+<p class="center">An easy to use calculator may help in these situations:</p>
+    <ul>
+        <li class="wrapper">Taxes are hard!</li>
+        <li>Should I take my benefits at 62 or wait? If I keep working until 70 I can not tax ANY of my bennefits.</li>
+        <li>My benefits and savings are not enough. Is $9.50/hr worth it?</li>
+        <li>Maybe every dollar I earn is taxed at the highest rate? Maybe not?</li>
+    </ul>
+   <p>  Senior's, after retiring, who are comtemplating, for whatever reason, going back to work should better think again.
+If you are among the unlucky few, like me, you may find that your income tax may be as high as 70% or higher. If this doesn't
+ seem possible then I have provided a calculator to help determine how much take-home pay you might actually end with.</p>
+<h3 class="center"> <button id="senior-reveal" onclick="reveal()">So here's the Senior Tax Calculator</button> </h3>
+</div>
+<h3 id="calc" class="center hide">Senior Tax Calculator<button onclick="reveal()"  style="float: right;">Back to Intro</button> </h3>
+<!--<button onclick="myFunction(event)">Click me</button>-->
+<div class="data-container hide">
+
+
+<table class='table-calc' id="table-example-1"><caption>Social Security Benefits Worksheet - Lines 20a and 20b (Form 1040)</caption>
+    <tr class="nicecolor"><td class='wrapper' title="1. SSA-1099 ">
+        <div class="tooltip">Click here and the sider will adjust your SSA-1099 benefits.</div>
+        1. box 5 SSA-1099</td><td id="line1" contentEditable>$38,218</td></tr>
+    <tr><td>2. half of line 1</td><td id="line2">$19,109</td></tr>
+    <!--<tr class="nicecolor"><td>2a. Retirement income</td><td id="line2a" contentEditable>$20000 </td></tr>-->
+    <tr class="nicecolor"><td class="wrapper"  title="3. Wages, Retirement">
+        <div class="tooltip">Click here and the sider will adjust your Wages.</div>
+        3. Wages</td><td class="toggle-amt" id="line3" onclick="setWages()" onchange="chgWages()" contentEditable>$3809 </td></tr>
+    <tr class="nicecolor"><td title="4. Tax exempt interest">4. Tax exempt interest(1040 - 8b)</td><td class="toggle-amt" id="line4">0</td></tr>
+    <tr class="nicecolor"><td class='wrapper' title="x. Prospective earnings">
+        <div class="tooltip">Click here and the sider will adjust your Prospective Wages.</div>
+        x. Prospective earnings (not in IRS worksheet)</td><td class="toggle-amt" id="linex">0</td></tr>
+    <tr><td>5. Combine 2,3,4</td><td id="line5"></td></tr>
+    <tr class="nicecolor"><td title="6. Adjustments">6. Adjustments to gross income(1040 - 23-32)</td><td class="toggle-amt" id="line6">0</td></tr>
+    <tr><td>7. Line 5 - 6. If zero or less then no ss income</td><td id="line7"></td></tr>
+    <tr><td>8. If married/joint - $32,000 </td><td id="line8">$32,000</td></tr>
+    <tr><td>9. Line 7 - 8. If zero or less then no ss income</td><td id="line9"></td></tr>
+    <tr><td>10. Married/joint - $12,000</td><td id="line10">$12,000</td></tr>
+    <tr><td>11. Line 9 - 10. If zero or less enter 0.</td><td id="line11"></td></tr>
+    <tr><td>12. Smaller of line 9 or 10</td><td id="line12"></td></tr>
+    <tr><td>13. Half of line 12</td><td id="line13"></td></tr>
+    <tr><td>14. Smaller of line 2 or 13</td><td id="line14"></td></tr>
+    <tr><td>15. Line 11 times .85</td><td id="line15"></td></tr>
+    <tr><td>16. Add lines 14 + 15</td><td id="line16"></td></tr>
+    <tr><td>17. Line 1 times .85</td><td id="line17"></td></tr>
+    <tr><td>18. Taxable social security benefits. Smaller of line 16 or 17</td><td class="toggle-amt" id="line18"></td></tr>
+
+</table>
+   <div class="data-right">
+        <!--<h1 ALIGN="center" STYLE="margin: 0">Welcome to my home page!</h1>-->
+        <!--<h4STYLE="margin: 0">Adjust slider with <span id="selected-input">selected input field</span> </h4>-->
+        <h4 style="text-align: center; margin: 0 10px;"></h4>
+        <!--<label for="fader">Prospective Wages</label>-->
+        <div class="center" >
+
+
+        <output for="fader" id="volume">0    </output><span id="slide-output"></span> <span id="maxxed"></span>
+        </div>
+       <div class="wrapper">
+            <input class="wrapper" type="range" min="0" max="100" value="0" id="fader" steps="1"
+                   oninput="outputUpdate(value)">
+           <div class="tooltip"  id="killslider">Click on line 1,3,4,x or 6 to adjust the slider.</div>
+       </div>
+<div class="quickinfo">
+
+    <table class="table-calc">
+        <caption>Effect on extra earning's taxes </caption>
+        <tr><th>Senior Tax</th><th>Earnings</th><th>Takehome</th><th>Taxable</th><th>Tax</th><th>Tax Rate</th></tr>
+        <tr><td>With</td><td class="toggle-amt" id="marginal-earn"></td><td class="toggle-amt" id="marginal-takehome"></td><td class="toggle-amt" id="marginal-taxable"></td><td class="toggle-amt" id="marginal-tax"></td><td class="toggle-amt" id="marginal-rate"></td></tr>
+        <tr><td>Without</td><td class="toggle-amt" id="wmarginal-earn"></td><td class="toggle-amt" id="wmarginal-takehome"><td class="toggle-amt" id="wmarginal-taxable"></td><td class="toggle-amt" id="wmarginal-tax"></td><td class="toggle-amt" id="wmarginal-rate"></td></tr>
+    </table>
+    <hr>
+</div>
+        <div id="quick-tax">
+            <table>
+                <tr><th>brackets</th><th><small>10%/5%</small></th><th><small>15%/7%</small></th><th><small>25%/7.8%</small></th><th><small>28%/7.8%</small></th><th>Total</th></th>
+                <tr><td id="qfed">fed tax</td><td class="toggle-amt" ></td><td class="toggle-amt" ></td><td class="toggle-amt" ></td><td></td><td></td></tr>
+                <tr><td id="qstat">state tax</td><td class="toggle-amt" ></td><td class="toggle-amt" ></td><td></td><td></td><td></td></tr>
+            </table>
+        </div>
+        <table class='table-calc' id="taxable"><caption>Tax - abbreviated for informational purposes</caption>
+            <tr><th></th><th>Gross</th><th>Taxable</th><th>Deductions</th></tr>
+            <tr><td>SSA-1099</td><td class="toggle-amt" id="gross-ss"></td><td class="toggle-amt" id="taxable-ss"></td><td class="toggle-amt"></td></tr>
+            <tr><td>Wages (line 5)</td><td class="toggle-amt" id="gross-ww"></td><td id="taxable-ww"></td><td class="toggle-amt"></td></tr>
+            <tr><td>Prospective Wages (line x)</td><td class="toggle-amt" id="gross-xx"></td><td class="toggle-amt" id="taxable-xx"></td><td class="toggle-amt"></td></tr>
+            <tr><td>Totals</td><td class="toggle-amt" id="gross-total"></td><td class="toggle-amt" id="taxable-total"></td><td id="tax-deductions"></td></tr>
+            <tr><td colspan="2">Fed Tax</td><td class="toggle-amt" class="toggle-amt" id="fed-tax-total"></td><td></td></tr>
+            <tr><td colspan="2">State Tax (example from Minnesota)</td><td class="toggle-amt" id="st-tax-total"></td><td></td></tr>
+            <tr><td colspan="2">FICA Tax</td><td class="toggle-amt" id="fica-tax-total"></td><td></td></tr>
+            <tr><td colspan="2">Total Tax (minus FICA tax)</td><td class="toggle-amt" id="tax-total"></td><td></td></tr>
+            <tr><td colspan="2">Tax Rate</td><td class="toggle-amt" id="tax-rate"></td><td></td></tr>
+        </table>
+    </div>
+</div>
+<hr>
+<div id="info">
+    <p>"<i>Social Security is largely a pay-as-you-go program. This means that today's workers pay Social Security taxes into
+        the program and money flows back out as monthly income to beneficiaries"</i> <a href="https://www.nasi.org/learn/socialsecurity/overview"  target="_blank">see from nasi.org</a>
+    As in our case this is a complete falsehood. Retired workers who pay into get NOTHING back!</p>
+<h4>Here's a simple example: <span>($1000-153 = 847 + 76 = 923 + 785 = 1708 * .32 = 547 + 153 = 700. 700/1000 = 70% tax rate)</span> </h4>
+<p>I make $1000 extra. I send $153 (15.3%) to the government. This will not increase my benefits because am getting benefits and have used
+    up my 35 years of earnings. Leaves me with $847. My 'taxable' income now is $923 (adding back my share of FICA). Now I have to add 785 of taxable income from
+    my social security benefits. Now my taxable income become $923 + $785 or $1708. Let's make this clear.</p>  <p>I keep $847 but
+my taxable income is $1708.</p>
+    <p> My fed income tax rate is 25% and state income tax rate is 7% in Minnesota. This gives me a tax of $547. $547 from income tax and $153 from FICA only leaves take-home pay of $300 giving me a rate of 70%.</p>
+
+</div>
+
+<script>
+
+    (function(globals){
+        "use strict";
+
+        globals.g = {};
+        globals.zd = function(x){return document.getElementById(x)};
+        globals.elApr;
+        globals.elLoan;
+        globals.elYears;
+        globals.elSlider;
+        globals.myScale = 1;
+        globals.marginalEarn = zd('marginal-earn');
+        globals.marginalTakeHome = zd('marginal-takehome');
+        globals.marginalTaxable = zd('marginal-taxable');
+        globals.marginalTax = zd('marginal-tax');
+        globals.marginalRate = zd('marginal-rate');
+        globals.wmarginalEarn = zd('wmarginal-earn');
+        globals.wmarginalTakeHome = zd('wmarginal-takehome');
+        globals.wmarginalTaxable = zd('wmarginal-taxable');
+        globals.wmarginalTax = zd('wmarginal-tax');
+        globals.wmarginalRate = zd('wmarginal-rate');
+        globals.fader = zd('fader');
+        // cache elements in chart
+        for(var i=1; i<19; i++){
+            globals['el' + i] = zd('line'+ i);
+        }
+        globals.elx = zd('linex');
+      //  globals.el2a = zd('line2a');
+        globals.lastSelected = elx;
+        lastSelected.style.background = 'lightgreen';
+        globals.standardDeduction = 23000;
+        globals.bracket = 1; // married joint
+       // globals.selecetInput =  zd('selected-input');
+        globals.maxxedSS = false;
+    }(this));
+    myScale = 1000;
+    var timeoutID;
+    var testElements = document.getElementsByClassName('nicecolor');
+
+    var testDivs = Array.prototype.filter.call(testElements, function(testElement){
+        return testElement.onclick = function(e){
+          //  console.log('clicked: ' + e.target)
+            var sliderTextElement = document.getElementsByClassName('data-right')[0].firstElementChild;
+            sliderTextElement.innerText = e.target.title;
+            lastSelected.style.background = 'white';
+            lastSelected = e.target.nextElementSibling;
+            if (lastSelected == null) lastSelected = e.target
+            lastSelected.style.background = 'lightgreen';
+            elSlider = lastSelected;
+            zd('volume').innerText = lastSelected.innerText;
+            var x = lastSelected.innerText.replace('$','').replace(',','') * 1;
+            fader.value = x / 1000;
+           // selecetInput.innerText = lastSelected.previousSibling.innerText.substr(3,6);
+            // set timeout for killing slider tooltip
+            setTimeout(function(){
+                zd('killslider').classList.remove('tooltip');
+                zd('killslider').classList.toggle('hide');
+                zd('killslider').innerHTML = '';
+            },4000);
+        }
+    });
+   // selecetInput.innerText = "Prospective Wages"
+    elSlider = elx;
+//    function setPWages() {
+//        elx.style.background = 'lightgreen';
+//    }
+    function reveal(){
+        zd('info').classList.toggle('hide');
+        zd('calc-intro').classList.toggle('hide');
+        zd('calc').classList.toggle('hide');
+        document.getElementsByClassName('data-container')[0].classList.toggle('hide');
+    }
+//    function myFunction(e){
+//        console.log('clicked' + e.clientX)
+//    }
+    function $$n(n) {
+        return '$' + n.toLocaleString();
+    }
+    function chgWages(){
+        console.log('changing wages')
+    }
+    function setLoanAmt(){
+        window.elSlider = window.elLoan;
+        window.myScale = 1000;
+        zd('slide-output').innerText = ' (Loan Amt)'
+    }
+    function setWages(){
+        window.elSlider = zd("line3");
+        window.myScale = 1000;
+        zd('slide-output').innerText = ' (wages)'
+    }
+    function outputUpdate(vol){
+        document.querySelector('#volume').value = vol * window.myScale;
+        document.querySelector('#volume').innerText = $$n(vol * window.myScale);
+        //  document.querySelector('#amount').value = vol * 1000;
+
+        window.elSlider.innerText = $$n(vol * window.myScale);
+        extract(g);
+        calculateTax();
+      //  calculate();
+    }
+    var l1 = zd('line1').innerText.replace('$','').replace(',','') * 1;
+    zd("line3").onkeyup = function(event) {
+        if (event.keyCode == 13) {
+            var line3 = zd('line3').innerText.replace('$','').replace(',','') * 1;
+
+          //  console.log("key=" + line3);
+            calculateTax();
+        }
+    };
+    zd("line1").onkeyup = function(event) {
+        if (event.keyCode == 13) {
+
+            var line1 = zd('line1').innerText.replace('$','').replace(',','') * 1;
+          //  console.log("key=" + line1);
+            calculateTax();
+        }
+    };
+    function onkeypressed(e){
+        if(e.keyCode==13){
+            // Enter pressed... do anything here...
+        }
+    }
+    function initTables(){
+        if (!localStorage.getItem('seniortax')){
+            console.log('no localstorage for seniortax')
+            // initialize tables
+            g.line1 = 40000;
+            g.line3 =  4000;
+            g.line4 = 0;
+            g.linex = 0;
+            g.line6 = 0;
+            g.line8 =  32000;
+            g.line10 =  12000;
+        }
+        else
+             g = JSON.parse(localStorage.getItem("seniortax"));
+        el1.innerText = $$n(g.line1);
+        el3.innerText = $$n(g.line3);
+        el4.innerText = $$n(g.line4);
+        elx.innerText = $$n(g.linex);
+        el6.innerText = $$n(g.line6);
+        el8.innerText = $$n(g.line8);
+        el10.innerText = $$n(g.line10);
+        zd('volume').innerText = elx.innerText;
+        var x = elx.innerText.replace('$','').replace(',','') * 1;
+        fader.value = x / 1000;
+    }
+    function extract(g){
+        g.line1 = el1.innerText.replace('$','').replace(',','') * 1;
+        g.line3 =  el3.innerText.replace('$','').replace(',','') * 1;
+        g.line4 = el4.innerText.replace('$','').replace(',','') * 1;
+        g.linex = elx.innerText.replace('$','').replace(',','') * 1;
+        g.line6 = el6.innerText.replace('$','').replace(',','') * 1;
+        g.line8 =  el8.innerText.replace('$','').replace(',','') * 1;
+        g.line10 =  el10.innerText.replace('$','').replace(',','') * 1;
+      //  localStorage.setItem("seniortax", g);
+        localStorage.setItem('seniortax', JSON.stringify(g));
+      //  var g = localStorage.getItem('seniortax');
+    }
+    function calculateTax(){
+        var elChanges = [];
+        toggles = document.querySelectorAll("td.toggle-amt");
+        for (var i = 0; i < toggles.length; ++i) {
+            elChanges.push(toggles[i].innerText)
+          //  console.log('changes= ' + toggles[i].innerText)
+        }
+
+
+       // console.log('test myscale global = ' + myScale);
+        var line1 = g.line1
+        var line2 = Math.floor(g.line1 * .5);
+        el2.innerText = $$n(line2);
+      //  var line2a = el2a.innerText.replace('$','').replace(',','') * 1;
+        var line3 =  g.line3;
+        var line4 = g.line4;
+        var linex = g.linex;
+      //  var line5 = (line2 + line2a + line3 + line4 + linex);
+        var line5 = (line2 + line3 + line4 + linex);
+        el5.innerText = $$n(line5);
+        var line6 = g.line6;
+        var line7 = line5 - line6;
+        if (line7 <= 0){
+            line7 = line9 = line10 = line11 = 0;
+           // return;
+        }
+       el7.innerText = $$n(line7);
+        var line8 =  g.line8;
+        var line9 = line7 - line8;
+        if (line9 <= 0) line9 = 0;
+        el9.innerText = $$n(line9);
+        var line10 =  g.line10;
+        var line11 = line9 - line10;
+        if (line11 <= 0) line11 = 0;
+        el11.innerText = $$n(line11);
+        var line12 = Math.min(line9,line10);
+        var line13 = Math.floor(line12/2);
+        var line14 = Math.min(line2,line13);
+        var line15 = Math.floor(line11 * .85);
+        var line16 = line14 + line15;
+        var line17 =  Math.floor(line1 * .85);
+        var line18 = Math.min(line16,line17);
+        maxxedSS = false;
+        if (line18 == line17){
+            zd('maxxed').style.display = 'inline';
+            zd('maxxed').innerText = ' (taxable income max: $' + line18 + ' )';
+            maxxedSS = true;
+        }
+
+        else {
+            zd('maxxed').style.display = 'none';
+
+        }
+
+        el12.innerText = $$n(line12);
+        el13.innerText = $$n(line13);
+        el14.innerText = $$n(line14);
+        el15.innerText = $$n(line15);
+        el16.innerText = $$n(line16);
+        el17.innerText = $$n(line17);
+        el18.innerText = $$n(line18);
+      //  el18.classList.toggle('yellow-back');
+        // set tax tables
+        zd('gross-ss').innerText = $$n(line1);
+        zd('gross-ww').innerText = $$n(line3);
+        zd('gross-xx').innerText = $$n(linex);
+        zd('taxable-ss').innerText = $$n(line18);
+        zd('tax-deductions').innerText = $$n(standardDeduction);
+      //  var taxableWages = (line2a + line3);
+        var taxableWages = line3;
+        if (taxableWages <= 0) taxableWages = 0;
+        zd('taxable-ww').innerText = $$n(taxableWages);
+        zd('taxable-xx').innerText = '$' + linex;
+       // var grossTotal = (line1 + line2a + line3 + line4 + linex);
+        var grossTotal = (line1 + line3 + line4 + linex);
+        zd('gross-total').innerText = $$n(grossTotal);
+        var grossTaxable = (line18 + taxableWages + linex);
+        var afterDeductions = (grossTaxable - standardDeduction);
+      //  if (afterDeductions <= 0) grossTaxable = 0;
+        zd('taxable-total').innerText = $$n(grossTaxable);
+
+        // figure tax
+        // first set marginal rate variable
+        var marginalFedRate = .1;
+        var marginalStateRate = .0532;
+        // fed
+        // brackets
+        var t1 = 18550, t2 = 75300, t3 = 151900, t4 = 231450; // for Married joint
+        if (bracket == 0){
+            t1 = 9275, t2 = 37650, t3 = 91150, t4 = 190150; // for Single
+        }
+        var fed1 = 0, fed2 = 0, fed3 = 0, fed4 = 0; // fed1 < 18550 fed2 < 75300 fed3 < 151900 fed4 < 231450
+        if (afterDeductions < t1)
+        {   if (afterDeductions > 0)
+            fed1 = afterDeductions * .10;
+        }
+        else if (afterDeductions < t2){
+            fed1 = t1 * .1;
+            fed2 = (afterDeductions - t1) * .15;
+            marginalFedRate = .15;
+           // console.log('<t2 = fed2=' + fed2 + ' aft= ' + afterDeductions)
+        }
+         else if (afterDeductions < t3){
+            fed1 = t1 * .1;
+            fed2 = (t2 - t1) * .15;
+           // console.log('<t3 = fed2=' + fed2 + ' aft= ' + afterDeductions)
+            fed3 = (afterDeductions - t2) * .25;
+            marginalFedRate = .25;
+        }
+        else {// any higher income is not relevant to senior tax
+            fed1 = t1 * .1;
+            fed2 = (t2 - t1) * .15;
+            fed3 = (t3 - t2) * .25;
+            fed4 = (afterDeductions - t3) * .28;
+            marginalFedRate = .28;
+        }
+        if (fed3 < 0){
+            console.log('fed3 neg')
+        }
+        var fedTax = fed1 + fed2 + fed3 + fed4;
+        var elQuickTax = zd('qfed').nextSibling;
+        elQuickTax.innerText = $$n(Math.floor(fed1));
+        elQuickTax.nextSibling.innerText = $$n(Math.floor(fed2));
+        elQuickTax.nextSibling.nextSibling.innerText = $$n(Math.floor(fed3));
+        elQuickTax.nextSibling.nextSibling.nextSibling.innerText = $$n(Math.floor(fed4));
+        elQuickTax.nextSibling.nextSibling.nextSibling.nextSibling.innerText = $$n(Math.floor(fedTax));
+        // state
+        // brackets
+        var st1 = 36650, st2 = 145620, st3 = 258260, st4 = 1000000; // for Married joint
+        if (bracket == 0){
+            st1 = 25070, st2 = 82360, st3 = 154950, st4 = 1000000; // for Single
+        }
+        var sat1 = 0, sat2 = 0, sat3 = 0, sat4 = 0; // fed1 < 18550 fed2 < 75300 fed3 < 151900 fed4 < 231450
+        if (afterDeductions < st1)
+        {
+            if (afterDeductions > 0)
+            sat1 = afterDeductions * .0535;
+        }
+        else if (afterDeductions < st2){
+            sat1 = st1 * .0535;
+            sat2 = (afterDeductions - st1) * .0705;
+            marginalStateRate = .0705;
+        }
+        else if (afterDeductions < st3){
+            sat1 = st1 * .0535;
+            sat2 = (st2 - st1) * .0705;
+            sat3 = (afterDeductions - st2) * .0785;
+            marginalStateRate = .0785;
+        }
+        else {// any higher income is not relevant to senior tax
+            sat1 = st1 * .0535;
+            sat2 = (st2 - st1) * .0705;
+            sat3 = (afterDeductions - st2) * .0785;
+            sat4 = (afterDeductions - st3) * .0785;
+        }
+        var stTax = sat1 + sat2 + sat3 + sat4;
+        elQuickTax = zd('qstat').nextSibling;
+        elQuickTax.innerText = $$n(Math.floor(sat1));
+        elQuickTax.nextSibling.innerText = $$n(Math.floor(sat2));
+        elQuickTax.nextSibling.nextSibling.innerText = $$n(Math.floor(sat3));
+        elQuickTax.nextSibling.nextSibling.nextSibling.innerText = $$n(Math.floor(sat4));
+        elQuickTax.nextSibling.nextSibling.nextSibling.nextSibling.innerText = $$n(Math.floor(stTax));
+        var ficaTax = (linex + line3) * .153;
+
+        if (grossTaxable <= 0) ficaTax = 0;
+
+        if (grossTaxable <= 0) fedTax = stTax = 0;
+        var tax = fedTax + stTax + ficaTax;
+        zd('st-tax-total').innerText = $$n(Math.floor(stTax));
+        zd('fica-tax-total').innerText = $$n(Math.floor(ficaTax));
+        zd('fed-tax-total').innerText = $$n(Math.floor(fedTax));
+        zd('tax-total').innerText = $$n(Math.floor(tax));
+        zd('tax-rate').innerText = Math.floor((tax * 100 / afterDeductions)) + '%';
+
+
+        // figure marginal tax
+        var mearn = 1000;
+        marginalEarn.innerText = '$'+ mearn;
+        var takeHome = mearn * .847;
+        marginalTakeHome.innerText = '$' + takeHome;
+        var mtaxable = (mearn * .923); // taxable of FICA
+        mtaxable = mtaxable + (mtaxable * .85); // take only taxable from taxable FICA
+        if (maxxedSS)
+            mtaxable = (mearn * .923);
+        marginalTaxable.innerText = '$' + Math.floor(mtaxable);
+        var mtax = (mtaxable * marginalFedRate) + // .25 fed tax
+                (mtaxable * marginalStateRate) +    // .07 state tax
+                (mearn * .153); // .153 fica tax
+//        var mtax = (mtaxable * .01) + // .25 fed tax
+//        (mtaxable * marginalStateRate) +    // .07 state tax
+//        (mearn * .153); // .153 fica tax
+        marginalTax.innerText = '$' + Math.floor(mtax);
+        var mrate = 0;
+        if (mearn > 0)
+            mrate = mtax / mearn;
+        marginalRate.innerText =Math.floor((mrate * 100)) + '%';
+        if (mrate > .55){
+            marginalRate.classList.add('red-rate');
+        } else {
+            marginalRate.classList.remove('red-rate')
+        }
+
+        // figure without senior tax
+        var wmearn = 1000;
+        wmarginalEarn.innerText = '$'+ 1000;
+        wmarginalTakeHome.innerText = '$' + wmearn;
+        var wmtaxable = (wmearn); // sub 1/2 ss tax + no .85 ss benefits
+        wmarginalTaxable.innerText = '$' + Math.floor(wmtaxable);
+        var wmtax = (wmtaxable * marginalFedRate) + // .25 fed tax
+                (wmtaxable * marginalStateRate);// +    // .07 state tax
+             //   (wmearn * .153); // .153 fica tax
+        wmarginalTax.innerText = '$' + Math.floor(wmtax);
+        var wmrate = 0;
+        if (wmearn > 0)
+            wmrate = wmtax / wmearn;
+        wmarginalRate.innerText =Math.floor((wmrate * 100)) + '%';
+        // chk changes
+        for (var i = 0; i < toggles.length; ++i) {
+            if (toggles[i].innerText != elChanges[i]) {
+                elChanges.push(toggles[i].innerText)
+             //   console.log('changes= ' + elChanges[i] +" to " +toggles[i].innerText);
+                toggles[i].classList.add('yellow-back')
+                clearTimeout(timeoutID);
+                timeoutID = window.setTimeout(function(){
+                    for (var i = 0; i < toggles.length; ++i) {
+                        toggles[i].classList.remove('yellow-back');
+                    }
+                }, 500);
+            }
+
+        }
+
+
+        extract(g);
+    }
+
+    initTables();
+    calculateTax();
+</script>
+</body>
+</html>
